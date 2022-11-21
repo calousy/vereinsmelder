@@ -21,10 +21,13 @@ import java.io.ByteArrayInputStream;
 import java.util.Optional;
 import org.meisl.vereinsmelder.components.appnav.AppNav;
 import org.meisl.vereinsmelder.components.appnav.AppNavItem;
+import org.meisl.vereinsmelder.data.Role;
 import org.meisl.vereinsmelder.data.entity.User;
 import org.meisl.vereinsmelder.security.AuthenticatedUser;
 import org.meisl.vereinsmelder.views.about.AboutView;
-import org.meisl.vereinsmelder.views.helloworld.HelloWorldView;
+import org.meisl.vereinsmelder.views.competition.CompetitionsView;
+import org.meisl.vereinsmelder.views.masterdata.club.ClubsView;
+import org.meisl.vereinsmelder.views.masterdata.user.UsersView;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -70,15 +73,24 @@ public class MainLayout extends AppLayout {
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         AppNav nav = new AppNav();
 
-        if (accessChecker.hasAccess(HelloWorldView.class)) {
-            nav.addItem(new AppNavItem("Hello World", HelloWorldView.class, "la la-globe"));
+        if (accessChecker.hasAccess(CompetitionsView.class)) {
+            nav.addItem(new AppNavItem("Wettbewerbe", CompetitionsView.class, "la la-globe"));
 
         }
+
+        authenticatedUser.get().ifPresent(u -> {
+            if (u.getRoles().contains(Role.ADMIN)) {
+                AppNavItem stammdaten = new AppNavItem("Stammdaten");
+                nav.addItem(stammdaten);
+                stammdaten.addItem(new AppNavItem("Benutzer", UsersView.class));
+                stammdaten.addItem(new AppNavItem("Vereine", ClubsView.class));
+            }
+        });
+
         if (accessChecker.hasAccess(AboutView.class)) {
             nav.addItem(new AppNavItem("About", AboutView.class, "la la-file"));
 
         }
-
         return nav;
     }
 
