@@ -3,6 +3,7 @@ package org.meisl.vereinsmelder.views.masterdata.user;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
@@ -28,25 +29,23 @@ public class UsersView extends VerticalLayout {
 
     private final Grid<User> grid;
     private final UserService userService;
-    private ClubService clubService;
+    private final ClubService clubService;
 
     public UsersView(@Autowired UserService userService, ClubService clubService) {
         this.userService = userService;
         this.clubService = clubService;
 
         grid = new Grid<>();
-        grid.setSizeFull();
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COMPACT);
         grid.addColumn(User::getUsername).setHeader("Benutzername");
         grid.addColumn(User::getName).setHeader("Name");
         grid.addColumn(User::getEmail).setHeader("E-Mail");
         grid.addColumn(User::getRoles).setHeader("Rollen");
-        grid.addColumn(u -> u.getManagerOf()).setHeader("Verein");
+        grid.addColumn(User::getManagerOf).setHeader("Verein");
         grid.addComponentColumn(user -> {
             Button button = new Button(VaadinIcon.EDIT.create());
             button.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            button.addClickListener(listener -> {
-                editUser(user);
-            });
+            button.addClickListener(listener -> editUser(user));
             return button;
         }).setFlexGrow(0).setAutoWidth(true);
         grid.addComponentColumn(user -> {
@@ -56,9 +55,7 @@ public class UsersView extends VerticalLayout {
         }).setFlexGrow(0).setAutoWidth(true);
 
         Button addButton = new Button(VaadinIcon.PLUS.create());
-        addButton.addClickListener(event -> {
-            editUser(new User());
-        });
+        addButton.addClickListener(event -> editUser(new User()));
 
         add(addButton, grid);
 

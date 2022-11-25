@@ -3,6 +3,7 @@ package org.meisl.vereinsmelder.views.masterdata.club;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -10,7 +11,6 @@ import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.meisl.vereinsmelder.data.entity.Club;
 import org.meisl.vereinsmelder.data.service.ClubService;
 import org.meisl.vereinsmelder.views.MainLayout;
@@ -31,7 +31,7 @@ public class ClubsView extends VerticalLayout {
         this.clubService = clubService;
 
         grid = new Grid<>();
-        //grid.addColumn(Club::getId);
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COMPACT);
         grid.addColumn(Club::getName).setHeader("Name");
         grid.addComponentColumn(x -> {
             // TODO
@@ -43,9 +43,7 @@ public class ClubsView extends VerticalLayout {
         grid.addComponentColumn(club -> {
             Button button = new Button(VaadinIcon.EDIT.create());
             button.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            button.addClickListener(listener -> {
-                editClub(club);
-            });
+            button.addClickListener(listener -> editClub(club));
             return button;
         }).setFlexGrow(0).setAutoWidth(true);
         grid.addComponentColumn(club -> {
@@ -61,9 +59,7 @@ public class ClubsView extends VerticalLayout {
         grid.setItems(objectVoidCallbackDataProvider);
 
         Button addButton = new Button(VaadinIcon.PLUS.create());
-        addButton.addClickListener(event -> {
-            editClub(new Club());
-        });
+        addButton.addClickListener(event -> editClub(new Club()));
 
         add(addButton, grid);
     }

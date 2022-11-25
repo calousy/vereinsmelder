@@ -3,6 +3,7 @@ package org.meisl.vereinsmelder.views.competition;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
@@ -35,7 +36,7 @@ public class CompetitionsView extends VerticalLayout {
         this.competitionService = competitionService;
 
         grid = new Grid<>();
-        grid.setSizeFull();
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COMPACT);
         grid.addItemClickListener(listener ->
                 grid.getUI().ifPresent(ui -> ui.navigate(CompetitionView.class, listener.getItem().getId().toString())));
         grid.addColumn(Competition::getDate).setHeader("Datum");
