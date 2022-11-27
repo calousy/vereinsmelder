@@ -29,6 +29,7 @@ public class CompetitionsView extends VerticalLayout {
 
     private final CompetitionService competitionService;
     private final Grid<Competition> grid;
+    private Grid.Column<Competition> editColumn;
 
 
     public CompetitionsView(@Autowired AuthenticatedUser authenticatedUser,
@@ -37,22 +38,27 @@ public class CompetitionsView extends VerticalLayout {
 
         grid = new Grid<>();
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COMPACT);
-        grid.addItemClickListener(listener ->
-                grid.getUI().ifPresent(ui -> ui.navigate(CompetitionView.class, listener.getItem().getId().toString())));
-        grid.addColumn(Competition::getDate).setHeader("Datum");
+        grid.addItemClickListener(listener -> {
+            if (listener.getColumn() == editColumn) {
+                return;
+            }
+            grid.getUI().ifPresent(ui -> ui.navigate(CompetitionView.class, listener.getItem().getId().toString()));
+        });
+        grid.addColumn(Competition::getDate).setHeader("Datum").setAutoWidth(true)
+                .setFlexGrow(0);
         grid.addColumn(Competition::getName).setHeader("Name");
-        grid.addColumn(Competition::getCategory).setHeader("Kategorie");
+        grid.addColumn(Competition::getCategory).setHeader("Kategorie").setAutoWidth(true)
+                .setFlexGrow(0);
+        grid.addColumn(Competition::getRegistrationEnd).setHeader("Meldefrist");
 
         authenticatedUser.get().ifPresent(user -> {
             if (!user.getRoles().contains(Role.ADMIN)) {
                 return;
             }
-            grid.addComponentColumn(competition -> {
+            editColumn = grid.addComponentColumn(competition -> {
                 Button button = new Button(VaadinIcon.EDIT.create());
                 button.addThemeVariants(ButtonVariant.LUMO_SMALL);
-                button.addClickListener(listener -> {
-                    editCompetition(competition);
-                });
+                button.addClickListener(listener -> editCompetition(competition));
                 return button;
             });
 

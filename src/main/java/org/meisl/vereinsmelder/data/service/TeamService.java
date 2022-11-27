@@ -40,6 +40,14 @@ public class TeamService {
         return repository.findByCompetition(competition).size();
     }
 
+    public Page<Team> listByCompetitionWhereEnabledIsTrue(Competition competition, Pageable pageable) {
+        return repository.findByCompetitionAndEnabledTrue(competition, pageable);
+    }
+
+    public int listByCompetitionWhereEnabledIsTrueCount(Competition competition) {
+        return repository.findByCompetitionAndEnabledTrue(competition).size();
+    }
+
     public Page<Team> list(Pageable pageable) {
         return repository.findAll(pageable);
     }

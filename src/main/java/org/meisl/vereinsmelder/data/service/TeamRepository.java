@@ -15,4 +15,8 @@ public interface TeamRepository extends JpaRepository<Team, UUID> {
 
     List<Team> findByCompetition(Competition competition);
 
+    Page<Team> findByCompetitionAndEnabledTrue(Competition competition, Pageable pageable);
+
+    List<Team> findByCompetitionAndEnabledTrue(Competition competition);
+
 }

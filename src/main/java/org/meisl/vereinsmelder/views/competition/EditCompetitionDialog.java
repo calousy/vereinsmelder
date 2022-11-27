@@ -18,8 +18,6 @@ public class EditCompetitionDialog extends ConfirmDialog {
 
     private final Competition competition;
 
-    private final Binder<Competition> competitionBinder = new Binder<>();
-
     public EditCompetitionDialog(Competition competition) {
         this.competition = competition;
 
@@ -43,6 +41,7 @@ public class EditCompetitionDialog extends ConfirmDialog {
         fl.addFormItem(dateTimePicker, "Ende Registrierung");
         add(fl);
 
+        Binder<Competition> competitionBinder = new Binder<>();
         competitionBinder.bind(competitionNameTf, Competition::getName, Competition::setName);
         competitionBinder.bind(datePicker, Competition::getDate, Competition::setDate);
         competitionBinder.bind(categorySelection, (ValueProvider<Competition, CompetitionCategory>) comp ->
@@ -59,5 +58,7 @@ public class EditCompetitionDialog extends ConfirmDialog {
         competitionBinder.setBean(competition);
     }
 
-
+    public Competition getCompetition() {
+        return competition;
+    }
 }

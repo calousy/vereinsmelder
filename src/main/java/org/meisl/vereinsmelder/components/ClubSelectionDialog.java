@@ -13,19 +13,18 @@ import java.util.Optional;
 public class ClubSelectionDialog extends ConfirmDialog {
 
     private final Select<Club> select;
-    private final ClubService clubService;
 
     public ClubSelectionDialog(ClubService clubService) {
-        this.clubService = clubService;
 
         setHeader("Verein auswählen");
 
         CallbackDataProvider<Club, Void> clubDataProvider = DataProvider.fromCallbacks(query ->
-                        clubService.list(PageRequest.of(query.getPage(), query.getPageSize())).get()
-                , query -> clubService.count()
+                        clubService.list(PageRequest.of(query.getPage(), query.getPageSize())).get(),
+                query -> clubService.count()
         );
 
         select = new Select<>();
+        select.setWidthFull();
         select.setItems(clubDataProvider);
 
         setCancelable(true);

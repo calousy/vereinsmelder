@@ -1,6 +1,5 @@
 package org.meisl.vereinsmelder.data.entity;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,5 +20,8 @@ public class Team extends AbstractEntity {
     @ManyToOne
     private Competition competition;
 
+    private boolean enabled = true;
+
     private LocalDateTime registered = LocalDateTime.now();
+    private LocalDateTime updated = LocalDateTime.now();
 }
