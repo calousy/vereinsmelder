@@ -2,24 +2,28 @@ package org.meisl.vereinsmelder.views.competition;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import org.meisl.vereinsmelder.data.Role;
 import org.meisl.vereinsmelder.data.entity.Competition;
+import org.meisl.vereinsmelder.data.filter.CompetitionFilter;
 import org.meisl.vereinsmelder.data.service.CompetitionService;
 import org.meisl.vereinsmelder.security.AuthenticatedUser;
 import org.meisl.vereinsmelder.views.MainLayout;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 
 @PageTitle("Wettbewerbe")
 @Route(value = "wettbewerbe", layout = MainLayout.class)
@@ -29,6 +33,7 @@ public class CompetitionsView extends VerticalLayout {
 
     private final CompetitionService competitionService;
     private final Grid<Competition> grid;
+    private final ConfigurableFilterDataProvider<Competition, Void, CompetitionFilter> filteredData;
     private Grid.Column<Competition> editColumn;
 
 
@@ -45,11 +50,17 @@ public class CompetitionsView extends VerticalLayout {
             grid.getUI().ifPresent(ui -> ui.navigate(CompetitionView.class, listener.getItem().getId().toString()));
         });
         grid.addColumn(Competition::getDate).setHeader("Datum").setAutoWidth(true)
-                .setFlexGrow(0);
-        grid.addColumn(Competition::getName).setHeader("Name");
+                .setFlexGrow(0).setResizable(true).setSortable(true);
+        grid.addColumn(Competition::getName).setHeader("Name").setResizable(true);
         grid.addColumn(Competition::getCategory).setHeader("Kategorie").setAutoWidth(true)
-                .setFlexGrow(0);
-        grid.addColumn(Competition::getRegistrationEnd).setHeader("Meldefrist");
+                .setFlexGrow(0).setResizable(true);
+        grid.addColumn(Competition::getRegistrationEnd).setHeader("Meldefrist").setResizable(true);
+
+        CallbackDataProvider<Competition, CompetitionFilter> dataProvider = DataProvider.fromFilteringCallbacks(query ->
+                        competitionService.list(query.getFilter().orElse(new CompetitionFilter()), VaadinSpringDataHelpers.toSpringPageRequest(query)).get()
+                , query ->
+                        competitionService.count(query.getFilter().orElse(new CompetitionFilter())));
+        filteredData = dataProvider.withConfigurableFilter();
 
         authenticatedUser.get().ifPresent(user -> {
             if (!user.getRoles().contains(Role.ADMIN)) {
@@ -63,17 +74,18 @@ public class CompetitionsView extends VerticalLayout {
             });
 
             Button addButton = new Button(VaadinIcon.PLUS.create());
-            add(addButton);
             addButton.addClickListener(listener -> editCompetition(new Competition()));
+            Checkbox showPastCompetitionsCheckbox = new Checkbox("Vergangene Wettbewerbe anzeigen");
+            showPastCompetitionsCheckbox.addValueChangeListener(listener -> {
+                filteredData.setFilter(new CompetitionFilter(listener.getValue()));
+            });
+            HorizontalLayout actionLayout = new HorizontalLayout(addButton, showPastCompetitionsCheckbox);
+            actionLayout.setAlignItems(Alignment.CENTER);
+            add(actionLayout);
         });
         add(grid);
 
-        CallbackDataProvider<Competition, Void> objectVoidCallbackDataProvider = DataProvider.fromCallbacks(query ->
-                        competitionService.list(PageRequest.of(query.getPage(), query.getPageSize())).get()
-                , query ->
-                        competitionService.count());
-
-        grid.setItems(objectVoidCallbackDataProvider);
+        grid.setItems(filteredData);
     }
 
     private void editCompetition(Competition competition) {

@@ -27,3 +27,10 @@ databaseChangeLog:
         - sqlFile:
             path: changelog/scripts/04-team-status.sql
             relativeToChangelogFile: true
+  - changeSet:
+      id: venue
+      author: Klaus Meisl
+      changes:
+        - sqlFile:
+            path: changelog/scripts/05-venue.sql
+            relativeToChangelogFile: true
