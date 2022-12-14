@@ -4,6 +4,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -11,19 +12,24 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.SortDirection;
+import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
-import org.meisl.vereinsmelder.data.Role;
 import org.meisl.vereinsmelder.data.entity.Competition;
+import org.meisl.vereinsmelder.data.entity.Team;
 import org.meisl.vereinsmelder.data.filter.CompetitionFilter;
 import org.meisl.vereinsmelder.data.service.CompetitionService;
 import org.meisl.vereinsmelder.security.AuthenticatedUser;
 import org.meisl.vereinsmelder.views.MainLayout;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 @PageTitle("Wettbewerbe")
 @Route(value = "wettbewerbe", layout = MainLayout.class)
@@ -49,12 +55,19 @@ public class CompetitionsView extends VerticalLayout {
             }
             grid.getUI().ifPresent(ui -> ui.navigate(CompetitionView.class, listener.getItem().getId().toString()));
         });
-        grid.addColumn(Competition::getDate).setHeader("Datum").setAutoWidth(true)
-                .setFlexGrow(0).setResizable(true).setSortable(true);
+        Grid.Column<Competition> dateColumn = grid.addColumn(new LocalDateRenderer<>(Competition::getDate)).setHeader("Datum")
+                .setAutoWidth(true).setResizable(true).setKey("date").setSortable(true);
         grid.addColumn(Competition::getName).setHeader("Name").setResizable(true);
         grid.addColumn(Competition::getCategory).setHeader("Kategorie").setAutoWidth(true)
                 .setFlexGrow(0).setResizable(true);
-        grid.addColumn(Competition::getRegistrationEnd).setHeader("Meldefrist").setResizable(true);
+        grid.addColumn(new LocalDateTimeRenderer<>(Competition::getRegistrationEnd))
+                .setHeader("Meldefrist").setAutoWidth(true).setResizable(true);
+
+        grid.addColumn(comp -> comp.getTeams().stream()
+                        .filter(Team::isEnabled).count())
+                .setHeader("Gemeldete Mannschaften").setAutoWidth(true).setFlexGrow(0);
+
+        grid.sort(List.of(new GridSortOrder<>(dateColumn, SortDirection.ASCENDING)));
 
         CallbackDataProvider<Competition, CompetitionFilter> dataProvider = DataProvider.fromFilteringCallbacks(query ->
                         competitionService.list(query.getFilter().orElse(new CompetitionFilter()), VaadinSpringDataHelpers.toSpringPageRequest(query)).get()
@@ -62,10 +75,7 @@ public class CompetitionsView extends VerticalLayout {
                         competitionService.count(query.getFilter().orElse(new CompetitionFilter())));
         filteredData = dataProvider.withConfigurableFilter();
 
-        authenticatedUser.get().ifPresent(user -> {
-            if (!user.getRoles().contains(Role.ADMIN)) {
-                return;
-            }
+        if (authenticatedUser.isAdmin()) {
             editColumn = grid.addComponentColumn(competition -> {
                 Button button = new Button(VaadinIcon.EDIT.create());
                 button.addThemeVariants(ButtonVariant.LUMO_SMALL);
@@ -82,7 +92,7 @@ public class CompetitionsView extends VerticalLayout {
             HorizontalLayout actionLayout = new HorizontalLayout(addButton, showPastCompetitionsCheckbox);
             actionLayout.setAlignItems(Alignment.CENTER);
             add(actionLayout);
-        });
+        }
         add(grid);
 
         grid.setItems(filteredData);

@@ -20,7 +20,7 @@ public class MelderService {
 
     public void melden(Competition competition, Club club) {
         long count = competition.getTeams().stream()
-                .filter(t -> t.getClub().equals(club)).count();
+                .filter(t -> t.getClub().equals(club) && t.isEnabled()).count();
         Team newTeam = new Team();
         newTeam.setCompetition(competition);
         newTeam.setClub(club);
@@ -36,11 +36,11 @@ public class MelderService {
     public void abmelden(Team team, Competition competition) {
         Club club = team.getClub();
         List<Team> sorted = competition.getTeams().stream()
-                .filter(t -> t.getClub().equals(club))
+                .filter(t -> t.getClub().equals(club) && t.isEnabled())
                 .sorted(Comparator.comparing(Team::getRegistered)).toList();
         Team teamToRemove = sorted.get(sorted.size() - 1);
         competition.getTeams().remove(teamToRemove);
-        teamService.delete(teamToRemove.getId());
+        teamService.deactivate(teamToRemove);
     }
 
 }

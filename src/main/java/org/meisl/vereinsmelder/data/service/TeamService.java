@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,20 +33,24 @@ public class TeamService {
         repository.deleteById(id);
     }
 
+    /**
+     * Pages teams for a given competition. Teams returned are enabled=true.
+     * @param competition
+     * @param pageable
+     * @return
+     */
     public Page<Team> listByCompetition(Competition competition, Pageable pageable) {
-        return repository.findByCompetition(competition, pageable);
-    }
-
-    public int listByCompetitionCount(Competition competition) {
-        return repository.findByCompetition(competition).size();
-    }
-
-    public Page<Team> listByCompetitionWhereEnabledIsTrue(Competition competition, Pageable pageable) {
         return repository.findByCompetitionAndEnabledTrue(competition, pageable);
     }
 
-    public int listByCompetitionWhereEnabledIsTrueCount(Competition competition) {
+    public int listByCompetitionCount(Competition competition) {
         return repository.findByCompetitionAndEnabledTrue(competition).size();
+    }
+
+    public Team deactivate(Team team) {
+        team.setEnabled(false);
+        team.setUpdated(LocalDateTime.now());
+        return repository.save(team);
     }
 
     public Page<Team> list(Pageable pageable) {

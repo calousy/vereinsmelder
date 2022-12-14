@@ -20,11 +20,9 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.meisl.vereinsmelder.components.ClubSelectionDialog;
-import org.meisl.vereinsmelder.data.Role;
 import org.meisl.vereinsmelder.data.entity.Club;
 import org.meisl.vereinsmelder.data.entity.Competition;
 import org.meisl.vereinsmelder.data.entity.Team;
-import org.meisl.vereinsmelder.data.entity.User;
 import org.meisl.vereinsmelder.data.service.ClubService;
 import org.meisl.vereinsmelder.data.service.CompetitionService;
 import org.meisl.vereinsmelder.data.service.MelderService;
@@ -43,12 +41,13 @@ import java.util.UUID;
 public class CompetitionView extends VerticalLayout implements
         HasUrlParameter<String> {
 
+    public static final String DATE_TIME_PATTERN = "dd.MM.YYYY HH:M:ss";
     private final AuthenticatedUser authenticatedUser;
     private final CompetitionService competitionService;
     private final ClubService clubService;
     private final MelderService melderService;
     private final Grid<Team> grid;
-    private final H2 h2;
+    private final H2 h2 = new H2();
     private Competition competition;
 
     public CompetitionView(@Autowired AuthenticatedUser authenticatedUser,
@@ -60,8 +59,7 @@ public class CompetitionView extends VerticalLayout implements
         this.clubService = clubService;
         this.melderService = melderService;
 
-        Optional<User> user = authenticatedUser.get();
-        Club managerOfClub = user.map(User::getManagerOf).orElse(null);
+        Club managerOfClub = authenticatedUser.getManagedClub();
 
         setMargin(true);
 
@@ -77,7 +75,7 @@ public class CompetitionView extends VerticalLayout implements
             actionLayout.add(new Label("Meine Mannschaft "), span, meldenButton);
         }
 
-        if (isAdmin()) {
+        if (currentUserIsAdmin()) {
             Button selectTeamButton = new Button("(Admin) Mannschaft melden");
             selectTeamButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             selectTeamButton.addClickListener(listener -> addTeamFromSelection());
@@ -87,18 +85,27 @@ public class CompetitionView extends VerticalLayout implements
         grid = new Grid<>();
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COMPACT);
         grid.addColumn(LitRenderer.of("${index + 1}")).setHeader("#")
-                .setAutoWidth(true).setFlexGrow(0);
+                .setAutoWidth(true).setFlexGrow(0).setResizable(true);
+
+        if (managerOfClub != null) {
+            grid.setClassNameGenerator(team -> {
+                if (team.getClub().equals(managerOfClub)) {
+                    return "my-club";
+                }
+                return null;
+            });
+        }
 
         grid.addColumn(Team::getName).setHeader("Name");
-        if (isAdmin()) {
-            grid.addColumn(new LocalDateTimeRenderer<>(Team::getRegistered)).setHeader("Gemeldet")
+        if (currentUserIsAdmin()) {
+            grid.addColumn(new LocalDateTimeRenderer<>(Team::getRegistered, DATE_TIME_PATTERN)).setHeader("Gemeldet")
                     .setFlexGrow(0).setAutoWidth(true);
-            grid.addColumn(new LocalDateTimeRenderer<>(Team::getUpdated)).setHeader("Aktualisiert")
+            grid.addColumn(new LocalDateTimeRenderer<>(Team::getUpdated, DATE_TIME_PATTERN)).setHeader("Aktualisiert")
                     .setFlexGrow(0).setAutoWidth(true);
         }
-        if (isAdmin() || managerOfClub != null) {
+        if (currentUserIsAdmin() || managerOfClub != null) {
             grid.addComponentColumn(team -> {
-                if ((isAdmin() || team.getClub().equals(managerOfClub))
+                if ((currentUserIsAdmin() || team.getClub().equals(managerOfClub))
                         && team.isEnabled()) {
                     Button abmeldenBtn = new Button("Abmelden");
                     abmeldenBtn.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
@@ -106,31 +113,38 @@ public class CompetitionView extends VerticalLayout implements
                     return abmeldenBtn;
                 }
                 return new Label("");
-            });
+            }).setResizable(true);
         }
 
-        Paragraph p = new Paragraph("Liste gemeldeter Mannschaften - keine Startliste!");
-
-        h2 = new H2();
-        Button editButton = new Button(VaadinIcon.EDIT.create());
-        editButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        editButton.addClickListener(listener -> {
-            EditCompetitionDialog editCompetitionDialog = new EditCompetitionDialog(competition);
-            editCompetitionDialog.addConfirmListener(x -> h2.setText(editCompetitionDialog.getCompetition().getName()));
-            editCompetitionDialog.open();
-        });
-        HorizontalLayout headerLayout = new HorizontalLayout(h2, editButton);
         h2.addClassNames(LumoUtility.Margin.Vertical.NONE);
+        HorizontalLayout headerLayout = new HorizontalLayout(h2);
         add(headerLayout);
-        if (user.isPresent()) {
+
+        if (currentUserIsAdmin()) {
+            Button editButton = new Button(VaadinIcon.EDIT.create());
+            editButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            editButton.addClickListener(listener -> {
+                EditCompetitionDialog editCompetitionDialog = new EditCompetitionDialog(competition);
+                editCompetitionDialog.addConfirmListener(editListener -> {
+                    Competition editedCompetition = editCompetitionDialog.getCompetition();
+                    competitionService.update(editedCompetition);
+                    h2.setText(editedCompetition.getName());
+                });
+                editCompetitionDialog.open();
+            });
+            headerLayout.add(editButton);
+        }
+        if (authenticatedUser.get().isPresent()) {
             add(actionLayout);
         }
-        add(p, grid);
+
+        Paragraph information = new Paragraph("Liste gemeldeter Mannschaften - keine Startliste!");
+        add(information, grid);
 
         CallbackDataProvider<Team, Void> objectVoidCallbackDataProvider = DataProvider.fromCallbacks(query ->
-                        teamService.listByCompetitionWhereEnabledIsTrue(competition, PageRequest.of(query.getPage(), query.getPageSize())).get(),
+                        teamService.listByCompetition(competition, PageRequest.of(query.getPage(), query.getPageSize())).get(),
                 query ->
-                        teamService.listByCompetitionWhereEnabledIsTrueCount(competition));
+                        teamService.listByCompetitionCount(competition));
 
         grid.setItems(objectVoidCallbackDataProvider);
     }
@@ -144,9 +158,8 @@ public class CompetitionView extends VerticalLayout implements
         dialog.open();
     }
 
-    private boolean isAdmin() {
-        Optional<User> user = authenticatedUser.get();
-        return user.isPresent() && user.get().getRoles().contains(Role.ADMIN);
+    private boolean currentUserIsAdmin() {
+        return authenticatedUser.isAdmin();
     }
 
     private void addTeam(Club club) {

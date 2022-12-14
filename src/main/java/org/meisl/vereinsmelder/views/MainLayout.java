@@ -4,12 +4,8 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.MenuItem;
-import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Footer;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.contextmenu.SubMenu;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.Scroller;
@@ -28,6 +24,7 @@ import org.meisl.vereinsmelder.views.about.AboutView;
 import org.meisl.vereinsmelder.views.competition.CompetitionsView;
 import org.meisl.vereinsmelder.views.masterdata.club.ClubsView;
 import org.meisl.vereinsmelder.views.masterdata.user.UsersView;
+import org.meisl.vereinsmelder.views.user.UserSettingsView;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -120,13 +117,16 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("align-items", "center");
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             userName.add(div);
-            userName.getSubMenu().addItem("Sign out", e -> {
+            SubMenu subMenu = userName.getSubMenu();
+            subMenu.addItem("Einstellungen", e -> getUI()
+                    .ifPresent(ui -> ui.navigate(UserSettingsView.class)));
+            subMenu.addItem("Abmelden", e -> {
                 authenticatedUser.logout();
             });
 
             layout.add(userMenu);
         } else {
-            Anchor loginLink = new Anchor("login", "Sign in");
+            Anchor loginLink = new Anchor("login", "Anmelden");
             layout.add(loginLink);
         }
 
