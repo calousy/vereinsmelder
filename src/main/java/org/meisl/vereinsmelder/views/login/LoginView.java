@@ -25,11 +25,16 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         LoginI18n i18n = LoginI18n.createDefault();
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("Vereinsmelder");
-        i18n.getHeader().setDescription("Login using user/user or admin/admin");
+        i18n.getForm().setPassword("Passwort");
+        i18n.getForm().setUsername("Benutzername oder E-Mail");
+        //i18n.getHeader().setDescription("Login using user/user or admin/admin");
         i18n.setAdditionalInformation(null);
         setI18n(i18n);
 
-        setForgotPasswordButtonVisible(false);
+        i18n.getForm().setForgotPassword("Passwort vergessen");
+        i18n.getForm().setTitle("Anmelden");
+
+        setForgotPasswordButtonVisible(true);
         setOpened(true);
     }
 

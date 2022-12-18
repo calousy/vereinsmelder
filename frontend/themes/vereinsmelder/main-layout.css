@@ -45,6 +45,7 @@ vaadin-scroller[slot="drawer"][overflow~="bottom"] {
 
 [slot="drawer"]:is(header, footer) {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: var(--lumo-space-s);
   padding: var(--lumo-space-s) var(--lumo-space-m);

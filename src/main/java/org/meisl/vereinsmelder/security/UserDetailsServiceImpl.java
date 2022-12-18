@@ -1,7 +1,9 @@
 package org.meisl.vereinsmelder.security;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.meisl.vereinsmelder.data.entity.User;
 import org.meisl.vereinsmelder.data.service.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +26,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("No user present with username: " + username);
-        } else {
-            return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getHashedPassword(),
-                    getAuthorities(user));
+        Optional<User> maybeUser = userRepository.findByUsername(username);
+        if (maybeUser.isEmpty()) {
+            maybeUser = userRepository.findByEmail(username);
+            if (maybeUser.isEmpty()) {
+                throw new UsernameNotFoundException("No user present with username/email: " + username);
+            }
         }
+        User user = maybeUser.get();
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getHashedPassword(),
+                getAuthorities(user));
     }
 
     private static List<GrantedAuthority> getAuthorities(User user) {

@@ -13,8 +13,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
+
 import org.meisl.vereinsmelder.components.appnav.AppNav;
 import org.meisl.vereinsmelder.components.appnav.AppNavItem;
 import org.meisl.vereinsmelder.data.Role;
@@ -127,7 +129,9 @@ public class MainLayout extends AppLayout {
             layout.add(userMenu);
         } else {
             Anchor loginLink = new Anchor("login", "Anmelden");
-            layout.add(loginLink);
+            Anchor registerLink = new Anchor("register", "Jetzt registrieren!");
+            registerLink.setClassName(LumoUtility.FontSize.XSMALL);
+            layout.add(loginLink, registerLink);
         }
 
         return layout;
