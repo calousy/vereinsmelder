@@ -19,3 +19,7 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
 
   liquibase.enabled: true
+
+logging.level.org.hibernate:
+  SQL: DEBUG
+  type.descriptor.sql.BasicBinder: TRACE

@@ -16,6 +16,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
+import java.util.Set;
 
 import org.meisl.vereinsmelder.components.appnav.AppNav;
 import org.meisl.vereinsmelder.components.appnav.AppNavItem;
@@ -26,6 +27,7 @@ import org.meisl.vereinsmelder.views.about.AboutView;
 import org.meisl.vereinsmelder.views.competition.CompetitionsView;
 import org.meisl.vereinsmelder.views.masterdata.club.ClubsView;
 import org.meisl.vereinsmelder.views.masterdata.user.UsersView;
+import org.meisl.vereinsmelder.views.myclub.MyClub;
 import org.meisl.vereinsmelder.views.user.UserSettingsView;
 
 /**
@@ -78,7 +80,13 @@ public class MainLayout extends AppLayout {
         }
 
         authenticatedUser.get().ifPresent(u -> {
-            if (u.getRoles().contains(Role.ADMIN)) {
+            Set<Role> roles = u.getRoles();
+            if (roles.contains(Role.SUPERMANAGER) || roles.contains(Role.ADMIN)) {
+                if (u.getManagerOf() != null) {
+                    nav.addItem(new AppNavItem("Mein Verein", MyClub.class));
+                }
+            }
+            if (roles.contains(Role.ADMIN)) {
                 AppNavItem stammdaten = new AppNavItem("Stammdaten");
                 nav.addItem(stammdaten);
                 stammdaten.addItem(new AppNavItem("Benutzer", UsersView.class));

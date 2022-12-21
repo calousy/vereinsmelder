@@ -21,8 +21,9 @@ public class User extends AbstractEntity {
     private String email;
     @JsonIgnore
     private String hashedPassword;
-    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(value = EnumType.STRING)
     private Set<Role> roles;
     @Lob
     @Column(length = 1000000)

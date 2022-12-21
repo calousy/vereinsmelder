@@ -4,40 +4,47 @@ databaseChangeLog:
       author: Klaus Meisl
       changes:
         - sqlFile:
-            path: changelog/scripts/01-create-users-comepetition-team-club-schemas.sql
+            path: scripts/01-create-users-comepetition-team-club-schemas.sql
             relativeToChangelogFile: true
   - changeSet:
       id: createUsers
       author: Klaus Meisl
       changes:
         - sqlFile:
-            path: changelog/scripts/02-default-users.sql
+            path: scripts/02-default-users.sql
             relativeToChangelogFile: true
   - changeSet:
       id: createClubs
       author: Klaus Meisl
       changes:
         - sqlFile:
-            path: changelog/scripts/03-default-clubs.sql
+            path: scripts/03-default-clubs.sql
             relativeToChangelogFile: true
   - changeSet:
       id: teamStatus
       author: Klaus Meisl
       changes:
         - sqlFile:
-            path: changelog/scripts/04-team-status.sql
+            path: scripts/04-team-status.sql
             relativeToChangelogFile: true
   - changeSet:
       id: venue
       author: Klaus Meisl
       changes:
         - sqlFile:
-            path: changelog/scripts/05-venue.sql
+            path: scripts/05-venue.sql
             relativeToChangelogFile: true
   - changeSet:
       id: venue_name
       author: Klaus Meisl
       changes:
         - sqlFile:
-            path: changelog/scripts/06-rename-venue-name.sql
+            path: scripts/06-rename-venue-name.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: user_roles
+      author: Klaus Meisl
+      changes:
+        - sqlFile:
+            path: scripts/07-user-roles.sql
             relativeToChangelogFile: true

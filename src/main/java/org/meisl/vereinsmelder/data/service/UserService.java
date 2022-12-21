@@ -1,7 +1,11 @@
 package org.meisl.vereinsmelder.data.service;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+
+import org.meisl.vereinsmelder.data.Role;
+import org.meisl.vereinsmelder.data.entity.Club;
 import org.meisl.vereinsmelder.data.entity.User;
 import org.meisl.vereinsmelder.data.service.exception.EmailExistsException;
 import org.meisl.vereinsmelder.data.service.exception.UsernameExistsException;
@@ -56,6 +60,21 @@ public class UserService {
 
     public int count() {
         return (int) repository.count();
+    }
+
+    public Page<User> findByClub(Club club, Pageable pageable) {
+        return repository.findByManagerOf(club, pageable);
+    }
+
+    public User toggleRole(User entity, Role role) {
+        Set<Role> roles = entity.getRoles();
+        boolean hasRole = roles.contains(role);
+        if (hasRole) {
+            roles.remove(role);
+        } else {
+            roles.add(role);
+        }
+        return update(entity);
     }
 
 }

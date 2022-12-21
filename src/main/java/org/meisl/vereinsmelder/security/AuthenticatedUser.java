@@ -33,7 +33,8 @@ public class AuthenticatedUser {
     }
 
     public Optional<User> get() {
-        return getAuthentication().flatMap(authentication -> userRepository.findByUsername(authentication.getName()));
+        return getAuthentication().flatMap(authentication -> userRepository
+                .findByUsername(authentication.getName()));
     }
 
     public void logout() {

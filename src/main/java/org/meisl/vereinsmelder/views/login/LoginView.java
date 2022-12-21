@@ -10,10 +10,11 @@ import com.vaadin.flow.router.internal.RouteUtil;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.meisl.vereinsmelder.security.AuthenticatedUser;
+import org.meisl.vereinsmelder.views.MainLayout;
 
 @AnonymousAllowed
 @PageTitle("Login")
-@Route(value = "login")
+@Route(value = "login", layout = MainLayout.class)
 public class LoginView extends LoginOverlay implements BeforeEnterObserver {
 
     private final AuthenticatedUser authenticatedUser;
@@ -23,18 +24,22 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver {
         setAction(RouteUtil.getRoutePath(VaadinService.getCurrent().getContext(), getClass()));
 
         LoginI18n i18n = LoginI18n.createDefault();
+        i18n.setAdditionalInformation(null);
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("Vereinsmelder");
-        i18n.getForm().setPassword("Passwort");
-        i18n.getForm().setUsername("Benutzername oder E-Mail");
         //i18n.getHeader().setDescription("Login using user/user or admin/admin");
-        i18n.setAdditionalInformation(null);
+        LoginI18n.Form i18nForm = i18n.getForm();
+        i18nForm.setPassword("Passwort");
+        i18nForm.setUsername("Benutzername oder E-Mail");
+        i18nForm.setForgotPassword("Passwort vergessen");
+        i18nForm.setTitle("Anmelden");
+
         setI18n(i18n);
 
-        i18n.getForm().setForgotPassword("Passwort vergessen");
-        i18n.getForm().setTitle("Anmelden");
-
         setForgotPasswordButtonVisible(true);
+        addForgotPasswordListener(listener -> {
+            getUI().ifPresent(ui -> ui.navigate(PasswordForgottenView.class));
+        });
         setOpened(true);
     }
 
