@@ -1,5 +1,6 @@
 package org.meisl.vereinsmelder.views.myclub;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -9,6 +10,7 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
@@ -31,9 +33,22 @@ public class MyClub extends VerticalLayout {
     private final AuthenticatedUser authenticatedUser;
     private final UserService userService;
 
+    private final TabSheet tabSheet = new TabSheet();
+
     public MyClub(@Autowired AuthenticatedUser authenticatedUser, UserService userService) {
         this.authenticatedUser = authenticatedUser;
         this.userService = userService;
+
+        H2 h2 = new H2(authenticatedUser.getManagedClub().getName());
+        h2.addClassName(LumoUtility.Margin.Top.NONE);
+        tabSheet.add("Benutzer", getUserManagement());
+        tabSheet.add("Kontakt", new ContactView());
+        tabSheet.setWidthFull();
+
+        add(h2, tabSheet);
+    }
+
+    private Component getUserManagement() {
 
         CallbackDataProvider<User, Void> dataProvider = DataProvider.fromCallbacks(q -> userService.findByClub(authenticatedUser.getManagedClub(),
                 VaadinSpringDataHelpers.toSpringPageRequest(q)).stream(), q -> (int)userService.findByClub(authenticatedUser.getManagedClub(),
@@ -77,10 +92,9 @@ public class MyClub extends VerticalLayout {
 
         grid.setItems(dataProvider);
 
-        H2 h2 = new H2(authenticatedUser.getManagedClub().getName());
-        h2.addClassName(LumoUtility.Margin.Top.NONE);
         Html html = new Html("<p><u><i>Manager:</i></u> Können Wettbewerbe melden und abmelden.<br/>" +
                 "<u><i>Super-Manager:</i></u> Können Benutzer zu Managern machen. Können Wettbewerbe melden und abmelden.</p>");
-        add(h2, html, grid);
+
+        return new VerticalLayout(html, grid);
     }
 }
