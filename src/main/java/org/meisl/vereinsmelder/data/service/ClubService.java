@@ -1,5 +1,6 @@
 package org.meisl.vereinsmelder.data.service;
 
+import jakarta.transaction.Transactional;
 import org.meisl.vereinsmelder.data.entity.Club;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ public class ClubService {
         repository.deleteById(id);
     }
 
+    @Transactional
     public Page<Club> list(Pageable pageable) {
         return repository.findAll(pageable);
     }

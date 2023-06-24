@@ -12,12 +12,16 @@ import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.meisl.vereinsmelder.data.entity.Club;
+import org.meisl.vereinsmelder.data.entity.User;
 import org.meisl.vereinsmelder.data.service.ClubService;
 import org.meisl.vereinsmelder.views.MainLayout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
-import javax.annotation.security.RolesAllowed;
+import jakarta.annotation.security.RolesAllowed;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @PageTitle("Stammdaten - Vereine")
 @Route(value = "stammdaten/vereine", layout = MainLayout.class)
@@ -33,11 +37,10 @@ public class ClubsView extends VerticalLayout {
         grid = new Grid<>();
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COMPACT);
         grid.addColumn(Club::getName).setHeader("Name");
-        grid.addComponentColumn(x -> {
-            // TODO
-//                    List<User> managers = x.getManagers() == null ? new ArrayList<>() : x.getManagers();
-//                    String join = String.join(";", managers.stream().map(User::getName).toList());
-                    return new Label("");
+        grid.addComponentColumn(club -> {
+                    Set<User> managers = club.getManagers() == null ? new HashSet<>() : club.getManagers();
+                    String join = String.join("; ", managers.stream().map(User::getName).toList());
+                    return new Label(join);
                 })
                 .setHeader("Managers");
         grid.addComponentColumn(club -> {

@@ -8,7 +8,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.meisl.vereinsmelder.views.MainLayout;
 
-import javax.annotation.security.RolesAllowed;
+import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("Mein Verein")
 @Route(value = "my-club/contact", layout = MainLayout.class)

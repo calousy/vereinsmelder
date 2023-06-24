@@ -24,7 +24,7 @@ import org.meisl.vereinsmelder.security.AuthenticatedUser;
 import org.meisl.vereinsmelder.views.MainLayout;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.security.RolesAllowed;
+import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("Mein Verein")
 @Route(value = "my-club", layout = MainLayout.class)

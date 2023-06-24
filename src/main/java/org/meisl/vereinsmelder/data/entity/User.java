@@ -3,7 +3,7 @@ package org.meisl.vereinsmelder.data.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Set;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import lombok.Getter;
 import lombok.Setter;

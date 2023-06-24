@@ -1,12 +1,12 @@
 package org.meisl.vereinsmelder.data.entity;
 
 import java.util.UUID;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 
 @MappedSuperclass
@@ -14,7 +14,7 @@ public abstract class AbstractEntity {
 
     @Id
     @GeneratedValue
-    @Type(type = "uuid-char")
+    @JdbcTypeCode(java.sql.Types.VARCHAR)
     private UUID id;
 
     public UUID getId() {
