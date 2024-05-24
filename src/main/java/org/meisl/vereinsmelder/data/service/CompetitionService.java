@@ -33,22 +33,22 @@ public class CompetitionService {
         repository.deleteById(id);
     }
 
-    private Page<Competition> listInFuture(Pageable pageable) {
-        return repository.findByDateAfter(LocalDate.now(), pageable);
+    private Page<Competition> listInFutureOrToday(Pageable pageable) {
+        return repository.findByDateAfter(LocalDate.now().minusDays(1), pageable);
     }
 
     public Page<Competition> list(CompetitionFilter filter, Pageable pageable) {
         if (filter.showAll) {
             return repository.findAll(pageable);
         }
-        return listInFuture(pageable);
+        return listInFutureOrToday(pageable);
     }
 
     public int count(CompetitionFilter filter) {
         if (filter.showAll) {
             return (int) repository.count();
         }
-        return (int) listInFuture(Pageable.unpaged()).stream().count();
+        return (int) listInFutureOrToday(Pageable.unpaged()).stream().count();
     }
 
 }

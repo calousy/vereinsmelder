@@ -1,12 +1,12 @@
 package org.meisl.vereinsmelder.views.competition;
 
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @PageTitle("Wettbewerb")
@@ -69,16 +70,16 @@ public class CompetitionView extends VerticalLayout implements
         if (managerOfClub != null) {
             Button meldenButton = new Button("Mannschaft melden");
             meldenButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            meldenButton.addClickListener(listener -> addTeam(managerOfClub));
+            meldenButton.addClickListener(listener -> addTeams(Set.of(managerOfClub)));
             Span span = new Span(managerOfClub.getName());
             span.setClassName(LumoUtility.FontWeight.BOLD);
-            actionLayout.add(new Label("Meine Mannschaft "), span, meldenButton);
+            actionLayout.add(new Text("Meine Mannschaft "), span, meldenButton);
         }
 
         if (currentUserIsAdmin()) {
             Button selectTeamButton = new Button("(Admin) Mannschaft melden");
             selectTeamButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            selectTeamButton.addClickListener(listener -> addTeamFromSelection());
+            selectTeamButton.addClickListener(listener -> addTeamsFromSelection());
             actionLayout.add(selectTeamButton);
         }
 
@@ -112,7 +113,7 @@ public class CompetitionView extends VerticalLayout implements
                     abmeldenBtn.addClickListener(listener -> removeTeam(team));
                     return abmeldenBtn;
                 }
-                return new Label("");
+                return new Text("");
             }).setResizable(true);
         }
 
@@ -149,11 +150,11 @@ public class CompetitionView extends VerticalLayout implements
         grid.setItems(objectVoidCallbackDataProvider);
     }
 
-    private void addTeamFromSelection() {
+    private void addTeamsFromSelection() {
         ClubSelectionDialog dialog = new ClubSelectionDialog(clubService);
         dialog.addConfirmListener(listener -> {
-            Optional<Club> selection = dialog.getSelection();
-            selection.ifPresent(this::addTeam);
+            Optional<Set<Club>> selection = dialog.getSelection();
+            selection.ifPresent(this::addTeams);
         });
         dialog.open();
     }
@@ -162,9 +163,10 @@ public class CompetitionView extends VerticalLayout implements
         return authenticatedUser.isAdmin();
     }
 
-    private void addTeam(Club club) {
-        melderService.melden(competition, club);
-
+    private void addTeams(Set<Club> club) {
+        for (Club cl : club) {
+            melderService.melden(competition, cl);
+        }
         grid.getDataProvider().refreshAll();
     }
 

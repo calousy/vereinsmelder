@@ -62,7 +62,6 @@ public class CompetitionsView extends VerticalLayout {
                 .setFlexGrow(0).setResizable(true);
         grid.addColumn(new LocalDateTimeRenderer<>(Competition::getRegistrationEnd))
                 .setHeader("Meldefrist").setAutoWidth(true).setResizable(true);
-
         grid.addColumn(comp -> comp.getTeams().stream()
                         .filter(Team::isEnabled).count())
                 .setHeader("Gemeldete Mannschaften").setAutoWidth(true).setFlexGrow(0);
@@ -70,9 +69,9 @@ public class CompetitionsView extends VerticalLayout {
         grid.sort(List.of(new GridSortOrder<>(dateColumn, SortDirection.ASCENDING)));
 
         CallbackDataProvider<Competition, CompetitionFilter> dataProvider = DataProvider.fromFilteringCallbacks(query ->
-                        competitionService.list(query.getFilter().orElse(new CompetitionFilter()), VaadinSpringDataHelpers.toSpringPageRequest(query)).get()
-                , query ->
-                        competitionService.count(query.getFilter().orElse(new CompetitionFilter())));
+                        competitionService.list(query.getFilter().orElse(new CompetitionFilter()),
+                                VaadinSpringDataHelpers.toSpringPageRequest(query)).get()
+                , query -> competitionService.count(query.getFilter().orElse(new CompetitionFilter())));
         filteredData = dataProvider.withConfigurableFilter();
 
         if (authenticatedUser.isAdmin()) {

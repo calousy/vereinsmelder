@@ -1,10 +1,10 @@
 package org.meisl.vereinsmelder.views.masterdata.club;
 
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
@@ -40,7 +40,7 @@ public class ClubsView extends VerticalLayout {
         grid.addComponentColumn(club -> {
                     Set<User> managers = club.getManagers() == null ? new HashSet<>() : club.getManagers();
                     String join = String.join("; ", managers.stream().map(User::getName).toList());
-                    return new Label(join);
+                    return new Text(join);
                 })
                 .setHeader("Managers");
         grid.addComponentColumn(club -> {

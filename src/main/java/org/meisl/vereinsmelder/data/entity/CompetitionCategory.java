@@ -23,7 +23,7 @@ public class CompetitionCategory {
     }
 
     public static CompetitionCategory get(String name) {
-        return getAllCategories().stream().filter(x -> x.name == name).findFirst()
+        return getAllCategories().stream().filter(x -> x.name.equalsIgnoreCase(name)).findFirst()
                 .orElse(new CompetitionCategory(""));
     }
 
