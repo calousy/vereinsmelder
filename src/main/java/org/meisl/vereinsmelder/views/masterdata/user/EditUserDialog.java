@@ -4,7 +4,6 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.EmailField;
-import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import org.meisl.vereinsmelder.data.entity.Club;
@@ -45,10 +44,10 @@ public class EditUserDialog extends ConfirmDialog {
         fl.addFormItem(email, "E-Mail");
         fl.add(clubSelect);
 
-        PasswordField passwordField = new PasswordField();
-        fl.addFormItem(passwordField, "Passwort");
+        //PasswordField passwordField = new PasswordField();
+        //fl.addFormItem(passwordField, "Passwort");
 
-        add(fl);
+        setText(fl);
 
         Binder<User> userBinder = new Binder<>();
         userBinder.bind(usernameTf, User::getUsername, User::setUsername);

@@ -29,7 +29,7 @@ public class EditClubDialog extends ConfirmDialog {
 
         FormLayout fl = new FormLayout();
         fl.addFormItem(vereinNameTf, "Verein");
-        add(fl);
+        setText(fl);
 
         Binder<Club> clubBinder = new Binder<>();
         clubBinder.bind(vereinNameTf, Club::getName, Club::setName);

@@ -19,7 +19,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Theme(value = "vereinsmelder", variant = Lumo.DARK)
 @PWA(name = "Vereinsmelder", shortName = "Vereinsmelder", offlineResources = {})
 @NpmPackage(value = "line-awesome", version = "1.3.0")
-@NpmPackage(value = "@vaadin-component-factory/vcf-nav", version = "1.1.0")
+@NpmPackage(value = "@vaadin-component-factory/vcf-nav", version = "1.1.3")
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {

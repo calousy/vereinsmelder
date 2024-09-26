@@ -1,7 +1,6 @@
 package org.meisl.vereinsmelder.data.entity;
 
 import java.util.List;
-import java.util.Optional;
 
 public class CompetitionCategory {
 
@@ -17,17 +16,18 @@ public class CompetitionCategory {
     public static CompetitionCategory U19 = new CompetitionCategory("U19");
     public static CompetitionCategory U23 = new CompetitionCategory("U23");
 
+    private final String name;
+
     public static List<CompetitionCategory> getAllCategories() {
         return List.of(HERREN, DAMEN, SENIOREN_HERREN_50, SENIOREN_HERREN_60, SENIORINNEN_50, SENIORINNEN_60,
                 MIXED, U14, U16, U19, U23);
     }
 
     public static CompetitionCategory get(String name) {
-        return getAllCategories().stream().filter(x -> x.name.equalsIgnoreCase(name)).findFirst()
+        return getAllCategories().stream().filter(category -> category.name.equalsIgnoreCase(name)).findFirst()
                 .orElse(new CompetitionCategory(""));
     }
 
-    private String name;
 
     private CompetitionCategory(String name) {
         this.name = name;

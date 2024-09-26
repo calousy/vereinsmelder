@@ -14,7 +14,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.meisl.vereinsmelder.data.entity.Club;
 import org.meisl.vereinsmelder.data.entity.User;
 import org.meisl.vereinsmelder.data.service.UserService;

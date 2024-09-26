@@ -33,14 +33,13 @@ public class MyClub extends VerticalLayout {
     private final AuthenticatedUser authenticatedUser;
     private final UserService userService;
 
-    private final TabSheet tabSheet = new TabSheet();
-
     public MyClub(@Autowired AuthenticatedUser authenticatedUser, UserService userService) {
         this.authenticatedUser = authenticatedUser;
         this.userService = userService;
 
         H2 h2 = new H2(authenticatedUser.getManagedClub().getName());
         h2.addClassName(LumoUtility.Margin.Top.NONE);
+        TabSheet tabSheet = new TabSheet();
         tabSheet.add("Benutzer", getUserManagement());
         tabSheet.add("Kontakt", new ContactView());
         tabSheet.setWidthFull();

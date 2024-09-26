@@ -8,7 +8,6 @@ import org.meisl.vereinsmelder.data.entity.Club;
 import org.meisl.vereinsmelder.data.service.ClubService;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -30,7 +29,7 @@ public class ClubSelectionDialog extends ConfirmDialog {
         select.setItems(clubDataProvider);
 
         setCancelable(true);
-        add(select);
+        setText(select);
     }
 
     public Optional<Set<Club>> getSelection() {
