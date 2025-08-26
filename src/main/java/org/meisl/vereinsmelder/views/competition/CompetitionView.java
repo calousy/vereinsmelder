@@ -40,7 +40,7 @@ import java.util.UUID;
 @Route(value = "wettbewerb", layout = MainLayout.class)
 @AnonymousAllowed
 public class CompetitionView extends VerticalLayout implements
-        HasUrlParameter<String> {
+        HasUrlParameter<UUID> {
 
     public static final String DATE_TIME_PATTERN = "dd.MM.YYYY HH:M:ss";
     private final AuthenticatedUser authenticatedUser;
@@ -89,7 +89,7 @@ public class CompetitionView extends VerticalLayout implements
                 .setAutoWidth(true).setFlexGrow(0).setResizable(true);
 
         if (managerOfClub != null) {
-            grid.setClassNameGenerator(team -> {
+            grid.setPartNameGenerator(team -> {
                 if (team.getClub().equals(managerOfClub)) {
                     return "my-club";
                 }
@@ -183,8 +183,8 @@ public class CompetitionView extends VerticalLayout implements
     }
 
     @Override
-    public void setParameter(BeforeEvent beforeEvent, String uuid) {
-        Optional<Competition> competition = competitionService.get(UUID.fromString(uuid));
+    public void setParameter(BeforeEvent beforeEvent, UUID uuid) {
+        Optional<Competition> competition = competitionService.get(uuid);
         this.competition = competition.orElseThrow();
         h2.setText(this.competition.getName());
     }

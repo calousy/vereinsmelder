@@ -53,7 +53,7 @@ public class CompetitionsView extends VerticalLayout {
             if (listener.getColumn() == editColumn) {
                 return;
             }
-            grid.getUI().ifPresent(ui -> ui.navigate(CompetitionView.class, listener.getItem().getId().toString()));
+            grid.getUI().ifPresent(ui -> ui.navigate(CompetitionView.class, listener.getItem().getId()));
         });
         Grid.Column<Competition> dateColumn = grid.addColumn(new LocalDateRenderer<>(Competition::getDate)).setHeader("Datum")
                 .setAutoWidth(true).setResizable(true).setKey("date").setSortable(true);
